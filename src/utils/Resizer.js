@@ -41,6 +41,9 @@
  * event that can be used to create performance optimizations (such as hiding/showing elements 
  * while resizing), custom layout logic, etc. See makeResizable() for details on the events.
  *
+ * All elements that get resized by this module trigger an onresize event. If the editor is
+ * resized, then EditorManager will trigger an onresize event for it.
+ *
  * A resizable element can be collapsed/expanded using the `show`, `hide` and `toggle` APIs or
  * via user action. This triggers panelCollapsed/panelExpanded events - see makeResizable().
  */
@@ -80,6 +83,7 @@ define(function (require, exports, module) {
         if (showFunc) {
             showFunc.apply(element);
         }
+        $(element).trigger("onresize");
     }
     
     /**
@@ -91,6 +95,7 @@ define(function (require, exports, module) {
         if (hideFunc) {
             hideFunc.apply(element);
         }
+        $(element).trigger("onresize");
     }
     
     /**
@@ -279,6 +284,7 @@ define(function (require, exports, module) {
                             if (!resizeStarted) {
                                 resizeStarted = true;
                                 $element.trigger("panelResizeStart", newSize);
+                                $element.trigger("onresize");
                             }
                             
                             // Resize the main element to the new size. If there is a content element, 
@@ -296,6 +302,7 @@ define(function (require, exports, module) {
                         if (!resizeStarted) {
                             resizeStarted = true;
                             $element.trigger("panelResizeStart", newSize);
+                            $element.trigger("onresize");
                         }
                     }
     
@@ -348,6 +355,7 @@ define(function (require, exports, module) {
                     
                     if (resizeStarted) {
                         $element.trigger("panelResizeEnd", [elementSize]);
+                        $element.trigger("onresize");
                     }
                     
                     // We wait 300ms to remove the resizer container to capture a mousedown

@@ -46,6 +46,7 @@
  *                             NOTE (#1257): getFocusedEditor() sometimes lags behind this event. Listeners
  *                             should use the arguments or call getActiveEditor() to reliably see which Editor 
  *                             just gained focus.
+ *    - onresize --            Fires when editor is resized.
  */
 define(function (require, exports, module) {
     "use strict";
@@ -380,6 +381,8 @@ define(function (require, exports, module) {
      * the Editor is swapped, and on window resize. But anyone who changes size/visiblity of editor
      * area siblings (toolbar, status bar, bottom panels) *must* manually call resizeEditor().
      *
+     * If the editor is resized, then trigger an onresize event.
+     *
      * @param {string=} refreshFlag For internal use. Set to "force" to ensure the editor will refresh, 
      *    "skip" to ensure the editor does not refresh, or leave undefined to let resizeEditor() determine 
      *    whether it needs to refresh.
@@ -389,7 +392,8 @@ define(function (require, exports, module) {
             return;  // still too early during init
         }
         
-        var editorAreaHt = _calcEditorHeight();
+        var editorAreaHt = _calcEditorHeight(),
+            resized = false;
         _editorHolder.height(editorAreaHt);    // affects size of "not-editor" placeholder as well
         
         if (_currentEditor) {
@@ -400,19 +404,27 @@ define(function (require, exports, module) {
                 if (refreshFlag === undefined) {
                     refreshFlag = REFRESH_FORCE;
                 }
+                resized = true;
+
             } else if (curWidth !== _lastEditorWidth) {
                 if (refreshFlag === undefined) {
                     refreshFlag = REFRESH_FORCE;
                 }
+                resized = true;
             }
             _lastEditorWidth = curWidth;
 
             if (refreshFlag === REFRESH_FORCE) {
                 _currentEditor.refreshAll(true);
             }
+
+            // Even if REFRESH_SKIP is passed in, still trigger event
+            if (resized) {
+                $(_currentEditor).trigger("onresize");
+            }
         }
     }
-    
+
     /**
      * NJ's editor-resizing fix. Whenever the window resizes, we immediately adjust the editor's
      * height.

@@ -53,6 +53,7 @@ define(function (require, exports, module) {
         FileIndexManager    = require("project/FileIndexManager"),
         KeyEvent            = require("utils/KeyEvent"),
         AppInit             = require("utils/AppInit"),
+        Resizer             = require("utils/Resizer"),
         StatusBar           = require("widgets/StatusBar"),
         ModalBar            = require("widgets/ModalBar").ModalBar;
 
@@ -329,13 +330,13 @@ define(function (require, exports, module) {
             
             $("#search-results .close")
                 .one("click", function () {
-                    $searchResultsDiv.hide();
+                    Resizer.hide($searchResultsDiv);
                     EditorManager.resizeEditor();
                 });
             
-            $searchResultsDiv.show();
+            Resizer.show($searchResultsDiv);
         } else {
-            $searchResultsDiv.hide();
+            Resizer.hide($searchResultsDiv);
         }
         
         EditorManager.resizeEditor();
